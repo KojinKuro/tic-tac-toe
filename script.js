@@ -113,9 +113,11 @@ const game = (function () {
       ];
     };
 
-    const getWinner = () => winner;
+    const getWinner = function () {
+      if (winner !== BLANK) return winner;
+    };
 
-    return { getBoard, setBoard, resetGame, getWinner };
+    return { getBoard, setBoard, resetGame, getWinner, BLANK };
   }
 
   return { createGameBoard, createPlayer };
@@ -128,9 +130,19 @@ var gb = game.createGameBoard(p1, p2);
 const domHandler = (function() {
   var mainNode = document.querySelector("main");
   var winnerNode = document.querySelector('.winner-name');
+  var resetButtonNode = document.querySelector('button.reset');
+
+  resetScreen();
   
   // event selectors
   mainNode.addEventListener("click", inputMove);
+  resetButtonNode.addEventListener("click", function() {
+    gb.resetGame();
+    resetScreen();
+    showReset();
+    winnerNode.innerText = gb.getWinner();
+    resetButtonNode.classList.add('hidden');
+  });
 
   function inputMove(e) {
     var eData = e.target.dataset;
@@ -144,6 +156,16 @@ const domHandler = (function() {
     var eData = e.target.dataset;
     e.target.innerText = gb.getBoard(eData.row, eData.col);
     winnerNode.innerText = gb.getWinner();
+    showReset();
+  }
+
+  function resetScreen() {
+    var buttons = mainNode.querySelectorAll('button');
+    buttons.forEach((button) => button.innerText = gb.BLANK);
+  }
+
+  function showReset() {
+    if(gb.getWinner()) resetButtonNode.classList.remove('hidden');
   }
 
   return { inputMove };
