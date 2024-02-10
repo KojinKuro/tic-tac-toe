@@ -27,9 +27,9 @@ const game = (function () {
       [BLANK, BLANK, BLANK],
     ];
 
-    const getBoard = function (x,y) {
+    const getBoard = function (x, y) {
       if (!arguments.length) return board;
-      if (arguments.length !== 2) throw new Error('Missing parameters');
+      if (arguments.length !== 2) throw new Error("Missing parameters");
       return board[x][y];
     };
 
@@ -124,3 +124,27 @@ const game = (function () {
 var p1 = game.createPlayer("📙");
 var p2 = game.createPlayer("O");
 var gb = game.createGameBoard(p1, p2);
+
+const domHandler = (function() {
+  var mainNode = document.querySelector("main");
+  var winnerNode = document.querySelector('.winner-name');
+  
+  // event selectors
+  mainNode.addEventListener("click", domHandler.inputMove);
+
+  function inputMove(e) {
+    var eData = e.target.dataset;
+    gb.setBoard(eData.row, eData.col);
+    
+    // updates the DOM
+    updateDOM(e);
+  }
+
+  function updateDOM(e) {
+    var eData = e.target.dataset;
+    e.target.innerText = gb.getBoard(eData.row, eData.col);
+    winnerNode.innerText = gb.getWinner();
+  }
+
+  return { inputMove };
+})();
