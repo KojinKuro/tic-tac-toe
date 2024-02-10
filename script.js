@@ -1,7 +1,6 @@
 const game = (function () {
-  function createPlayer(name, symbol) {
+  function createPlayer(symbol) {
     let playerSymbol = symbol;
-    const playerName = name;
 
     const setSymbol = function (symbol) {
       playerSymbol = symbol;
@@ -11,28 +10,32 @@ const game = (function () {
       return playerSymbol;
     };
 
-    return { getSymbol, setSymbol, playerName };
+    return { getSymbol, setSymbol };
   }
 
   function createGameBoard(p1, p2) {
+    const BLANK = "_";
+
     let player1 = p1;
     let player2 = p2;
     let turn = player1;
+    let winner = BLANK;
     let moveCount = 0;
-
-    const BLANK = "_";
-
     let board = [
       [BLANK, BLANK, BLANK],
       [BLANK, BLANK, BLANK],
       [BLANK, BLANK, BLANK],
     ];
 
-    const getBoard = function () {
-      return board;
+    const getBoard = function (x,y) {
+      if (!arguments.length) return board;
+      if (arguments.length !== 2) throw new Error('Missing parameters');
+      return board[x][y];
     };
 
     const checkWinner = function (x, y) {
+      if (winner !== BLANK) return;
+
       const SYMBOL = board[x][y];
       const B_LENGTH = board.length;
       const B_END = B_LENGTH - 1;
@@ -40,20 +43,20 @@ const game = (function () {
       // check columns
       for (let i = 0; i < B_LENGTH; ++i) {
         if (board[x][i] !== SYMBOL) break;
-        if (i === B_END) console.log(`${SYMBOL} won!`);
+        if (i === B_END) winner = SYMBOL;
       }
 
       // check rows
       for (let i = 0; i < B_LENGTH; ++i) {
         if (board[i][y] !== SYMBOL) break;
-        if (i === B_END) console.log(`${SYMBOL} won!`);
+        if (i === B_END) winner = SYMBOL;
       }
 
       // check diagonal
       if (x === y) {
         for (let i = 0; i < B_LENGTH; ++i) {
           if (board[i][i] != SYMBOL) break;
-          if (i === B_END) console.log(`${SYMBOL} won!`);
+          if (i === B_END) winner = SYMBOL;
         }
       }
 
@@ -61,7 +64,7 @@ const game = (function () {
       if (x + y == B_END) {
         for (let i = 0; i < B_LENGTH; ++i) {
           if (board[i][B_END - i] !== SYMBOL) break;
-          if (i == B_END) console.log(`${SYMBOL} won!`);
+          if (i === B_END) winner = SYMBOL;
         }
       }
 
@@ -70,11 +73,8 @@ const game = (function () {
     };
 
     const switchTurn = function () {
-      if (turn === player1) {
-        turn = player2;
-      } else {
-        turn = player1;
-      }
+      if (turn === player1) turn = player2;
+      else turn = player1;
     };
 
     const setBoard = function (row, col) {
@@ -99,9 +99,13 @@ const game = (function () {
         }
         console.log(rowString);
       }
+      console.log(winner);
     };
 
-    const resetBoard = function () {
+    const resetGame = function () {
+      turn = player1;
+      winner = BLANK;
+      moveCount = 0;
       board = [
         [BLANK, BLANK, BLANK],
         [BLANK, BLANK, BLANK],
@@ -109,12 +113,14 @@ const game = (function () {
       ];
     };
 
-    return { getBoard, setBoard, resetBoard };
+    const getWinner = () => winner;
+
+    return { getBoard, setBoard, resetGame, getWinner };
   }
 
   return { createGameBoard, createPlayer };
 })();
 
-var p1 = game.createPlayer("Charles", "X");
-var p2 = game.createPlayer("Opponent", "O");
+var p1 = game.createPlayer("📙");
+var p2 = game.createPlayer("O");
 var gb = game.createGameBoard(p1, p2);
