@@ -130,7 +130,7 @@ const domHandler = (function() {
   var winnerNode = document.querySelector('.winner-name');
   
   // event selectors
-  mainNode.addEventListener("click", domHandler.inputMove);
+  mainNode.addEventListener("click", inputMove);
 
   function inputMove(e) {
     var eData = e.target.dataset;
