@@ -15,6 +15,7 @@ const game = (function () {
 
   function createGameBoard(p1, p2) {
     const BLANK = "_";
+    const DRAW = "DRAW";
 
     let player1 = p1;
     let player2 = p2;
@@ -69,7 +70,7 @@ const game = (function () {
       }
 
       // check for draw
-      if (moveCount >= B_LENGTH ** 2) console.log("DRAW!");
+      if (moveCount >= B_LENGTH ** 2) winner = DRAW;
     };
 
     const switchTurn = function () {
