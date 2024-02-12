@@ -38,6 +38,15 @@ div > button {
   background-color: $clr-background;
 }
 
+#score-section {
+  display: grid;
+  grid-template:  repeat(2,3rem) / 500px 200px 500px;
+
+  font-size: 3rem;
+  text-align: center;
+  justify-content: center;
+}
+
 footer {
   text-align: center;
   background-color: grey;
