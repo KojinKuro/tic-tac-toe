@@ -174,6 +174,9 @@ const domHandler = (function () {
   var mainNode = document.querySelector("main");
   var winnerNode = document.querySelector(".winner-name");
   var resetButtonNode = document.querySelector("button.reset");
+
+  var p1SymbolNode = document.querySelector('#player1-symbol');
+  var p2SymbolNode = document.querySelector('#player2-symbol');
   var scoreNodes = document.querySelectorAll(".score");
 
   resetScreen();
@@ -200,7 +203,8 @@ const domHandler = (function () {
     var eData = e.target.dataset;
     e.target.innerText = gb.getBoard(eData.row, eData.col);
     winnerNode.innerText = gb.getWinnerSymbol();
-  
+    p1SymbolNode.innerText = p1.getSymbol();
+    p2SymbolNode.innerText = p2.getSymbol();  
     updateScore();
     showReset();
   }
@@ -215,6 +219,8 @@ const domHandler = (function () {
   function resetScreen() {
     var buttons = mainNode.querySelectorAll("button");
     buttons.forEach((button) => (button.innerText = gb.BLANK));
+    p1SymbolNode.innerText = p1.getSymbol();
+    p2SymbolNode.innerText = p2.getSymbol();
   }
 
   function showReset() {
