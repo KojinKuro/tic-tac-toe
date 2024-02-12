@@ -182,27 +182,26 @@ const domHandler = (function () {
   resetScreen();
 
   // event selectors
-  mainNode.addEventListener("click", inputMove);
+  mainNode.addEventListener('click', inputMove);
+  p1SymbolNode.addEventListener('click',inputSymbol);
+  p2SymbolNode.addEventListener('click',inputSymbol);
 
-  function inputMove(e) {
+  function inputMove(event) {
     if(gb.hasWinner()) { 
       resetScreen();
       return;
     }
 
-    var eData = e.target.dataset;
+    var eData = event.target.dataset;
     gb.setBoard(eData.row, eData.col);
-
-    // updates the DOM
-    updateDOM(e);
+    updateDOM(event);
   }
 
   function updateDOM(e) {
     var eData = e.target.dataset;
     e.target.innerText = gb.getBoard(eData.row, eData.col);
     winnerNode.innerText = gb.getWinnerSymbol();
-    p1SymbolNode.innerText = p1.getSymbol();
-    p2SymbolNode.innerText = p2.getSymbol();  
+    updateSymbol();
     updateScore();
   }
 
@@ -213,12 +212,43 @@ const domHandler = (function () {
     }
   }
 
-  function resetScreen() {
-    buttons.forEach((button) => (button.innerText = gb.BLANK));
+  function updateSymbol() {
     p1SymbolNode.innerText = p1.getSymbol();
     p2SymbolNode.innerText = p2.getSymbol();
-    winnerNode.innerText = gb.getWinnerSymbol();
+  }
 
+  function inputSymbol(event) {
+    var symbolNode = event.currentTarget;
+    var inputBox = document.createElement('input');
+    inputBox.setAttribute('type','text');
+    symbolNode.innerHTML = ''
+    symbolNode.appendChild(inputBox);
+    inputBox.focus();
+
+    symbolNode.removeEventListener('click', inputSymbol);
+    symbolNode.addEventListener('keypress', setSymbol);
+    symbolNode.addEventListener('focusout', setSymbol);
+
+    function setSymbol(event) {
+      if (event.key !== 'Enter' && event.type !== 'focusout') return;
+      symbolNode.innerHTML = ''
+
+      if(inputBox.value !== '') {
+        if(symbolNode.id === "player1-symbol") p1.setSymbol(inputBox.value);
+        else p2.setSymbol(inputBox.value);          
+      }
+
+      updateSymbol();        
+      symbolNode.removeEventListener('keypress', setSymbol);
+      symbolNode.removeEventListener('focusout', setSymbol);
+      symbolNode.addEventListener('click', inputSymbol);
+    }
+  }
+
+  function resetScreen() {
+    buttons.forEach((button) => (button.innerText = gb.BLANK));
+    winnerNode.innerText = gb.getWinnerSymbol();
+    updateSymbol();
     gb.resetGame();
   }
 
