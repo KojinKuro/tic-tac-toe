@@ -1,4 +1,5 @@
 $clr-background: white;
+$clr-grid: black;
 
 .hidden {
   display: none;
@@ -13,29 +14,38 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
+  background-color: $clr-background;
 }
 
 main {
   flex: 1;
 }
 
-main > #game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+#grid {
+  $square-size: 200px;
+  $symbol-size: calc($square-size*0.7);
+  $grid-size: 7px;
 
-  background-color: black;
+  display: grid;
+  grid-template: repeat(3,$square-size) / repeat(3,$square-size);
+  width: calc(3*$square-size);
+
+  gap: $grid-size;
+
+  background-color: $clr-grid;
+
+  button {
+    font-size: $symbol-size;
+    border: none;
+    background-color: $clr-background;
+  }
 }
 
-div > button {
-  width: 200px;
-  height: 200px;
-  font-size: 150px;
+main > #game {
+  display: flex;
+  justify-content: center;
 
-  gap: 10px;
-
-  border: none;
-  background-color: $clr-background;
+  margin: 20px;
 }
 
 #score-section {
@@ -51,6 +61,6 @@ footer {
   text-align: center;
   background-color: grey;
 
-  font-size: 1.5rem;
-  padding: 20px 0;
+  font-size: 1.25rem;
+  padding: 15px 0;
 }
