@@ -172,8 +172,8 @@ var gb = game.createGameBoard(p1, p2);
 
 const domHandler = (function () {
   var mainNode = document.querySelector("main");
+  var buttons = mainNode.querySelectorAll("button");
   var winnerNode = document.querySelector(".winner-name");
-  var resetButtonNode = document.querySelector("button.reset");
 
   var p1SymbolNode = document.querySelector('#player1-symbol');
   var p2SymbolNode = document.querySelector('#player2-symbol');
@@ -183,15 +183,13 @@ const domHandler = (function () {
 
   // event selectors
   mainNode.addEventListener("click", inputMove);
-  resetButtonNode.addEventListener("click", function () {
-    gb.resetGame();
-    resetScreen();
-    showReset();
-    winnerNode.innerText = gb.getWinner();
-    resetButtonNode.classList.add("hidden");
-  });
 
   function inputMove(e) {
+    if(gb.hasWinner()) { 
+      resetScreen();
+      return;
+    }
+
     var eData = e.target.dataset;
     gb.setBoard(eData.row, eData.col);
 
@@ -206,7 +204,6 @@ const domHandler = (function () {
     p1SymbolNode.innerText = p1.getSymbol();
     p2SymbolNode.innerText = p2.getSymbol();  
     updateScore();
-    showReset();
   }
 
   function updateScore() {
@@ -217,14 +214,12 @@ const domHandler = (function () {
   }
 
   function resetScreen() {
-    var buttons = mainNode.querySelectorAll("button");
     buttons.forEach((button) => (button.innerText = gb.BLANK));
     p1SymbolNode.innerText = p1.getSymbol();
     p2SymbolNode.innerText = p2.getSymbol();
-  }
+    winnerNode.innerText = gb.getWinnerSymbol();
 
-  function showReset() {
-    if (gb.hasWinner()) resetButtonNode.classList.remove("hidden");
+    gb.resetGame();
   }
 
   return { inputMove };
