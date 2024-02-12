@@ -1,16 +1,23 @@
 const game = (function () {
   function createPlayer(symbol) {
     let playerSymbol = symbol;
+    let points = 0;
 
     const setSymbol = function (symbol) {
       playerSymbol = symbol;
     };
 
-    const getSymbol = function () {
-      return playerSymbol;
-    };
+    const getSymbol = () => playerSymbol;
 
-    return { getSymbol, setSymbol };
+    const addPoint = function () {
+      points += 1;
+    }
+
+    const getPoints = function () {
+      return points;
+    }
+
+    return { getSymbol, setSymbol, getPoints, addPoint };
   }
 
   function createGameBoard(p1, p2) {
