@@ -9,25 +9,30 @@ const game = (function () {
 
     const getSymbol = () => playerSymbol;
 
-    const addPoint = function () {
+    const addScore = function () {
       points += 1;
-    }
+    };
 
-    const getPoints = function () {
+    const getScore = function () {
       return points;
-    }
+    };
 
-    return { getSymbol, setSymbol, getPoints, addPoint };
+    return { getSymbol, setSymbol, getScore, addScore };
   }
 
   function createGameBoard(p1, p2) {
     const BLANK = "_";
     const DRAW = "DRAW";
 
+    let click = new Audio("./sounds/click.wav");
+    let win = new Audio("./sounds/win.wav");
+
     let player1 = p1;
     let player2 = p2;
+    let tie = createPlayer("Tie");
     let turn = player1;
     let winner = BLANK;
+
     let moveCount = 0;
     let board = [
       [BLANK, BLANK, BLANK],
@@ -35,14 +40,23 @@ const game = (function () {
       [BLANK, BLANK, BLANK],
     ];
 
+    const getScore = function () {
+      return [player1.getScore(), tie.getScore(), player2.getScore()];
+    };
+
     const getBoard = function (x, y) {
       if (!arguments.length) return board;
       if (arguments.length !== 2) throw new Error("Missing parameters");
       return board[x][y];
     };
 
+    const setWinner = function (newWinner) {
+      newWinner.addScore();
+      winner = newWinner;
+    };
+
     const checkWinner = function (x, y) {
-      if (winner !== BLANK) return;
+      if (hasWinner()) return;
 
       const SYMBOL = board[x][y];
       const B_LENGTH = board.length;
@@ -51,20 +65,20 @@ const game = (function () {
       // check columns
       for (let i = 0; i < B_LENGTH; ++i) {
         if (board[x][i] !== SYMBOL) break;
-        if (i === B_END) winner = SYMBOL;
+        if (i === B_END) setWinner(turn);
       }
 
       // check rows
       for (let i = 0; i < B_LENGTH; ++i) {
         if (board[i][y] !== SYMBOL) break;
-        if (i === B_END) winner = SYMBOL;
+        if (i === B_END) setWinner(turn);
       }
 
       // check diagonal
       if (x === y) {
         for (let i = 0; i < B_LENGTH; ++i) {
           if (board[i][i] != SYMBOL) break;
-          if (i === B_END) winner = SYMBOL;
+          if (i === B_END) setWinner(turn);
         }
       }
 
@@ -72,15 +86,14 @@ const game = (function () {
       if (x + y == B_END) {
         for (let i = 0; i < B_LENGTH; ++i) {
           if (board[i][B_END - i] !== SYMBOL) break;
-          if (i === B_END) winner = SYMBOL;
+          if (i === B_END) setWinner(turn);
         }
       }
 
       // check for draw
-      if (moveCount >= B_LENGTH ** 2) winner = DRAW;
-
-      // add points
-      if (winner !== BLANK) turn.addPoint();
+      if (moveCount >= B_LENGTH ** 2 && !hasWinner()) {
+        setWinner(tie);
+      }
     };
 
     const switchTurn = function () {
@@ -88,11 +101,26 @@ const game = (function () {
       else turn = player1;
     };
 
+    const hasWinner = () => {
+      return winner === player1 || winner === player2 || winner === tie;
+    };
+
+    const isTied = () => winner === tie;
+
+    const getWinnerSymbol = function () {
+      if (hasWinner()) return winner.getSymbol();
+      return BLANK;
+    };
+
     const setBoard = function (row, col) {
       if (board[row][col] === BLANK) {
         board[row][col] = turn.getSymbol();
         moveCount += 1;
         checkWinner(row, col);
+
+        if (hasWinner() && !isTied()) win.play();
+        else click.play();
+
         switchTurn();
       } else {
         console.log("INVALID: There is already a mark there! Try again.");
@@ -123,11 +151,16 @@ const game = (function () {
       ];
     };
 
-    const getWinner = function () {
-      if (winner !== BLANK) return winner;
+    return {
+      getBoard,
+      setBoard,
+      resetGame,
+      getWinnerSymbol,
+      hasWinner,
+      isTied,
+      BLANK,
+      getScore,
     };
-
-    return { getBoard, setBoard, resetGame, getWinner, BLANK };
   }
 
   return { createGameBoard, createPlayer };
@@ -137,27 +170,28 @@ var p1 = game.createPlayer("📙");
 var p2 = game.createPlayer("O");
 var gb = game.createGameBoard(p1, p2);
 
-const domHandler = (function() {
+const domHandler = (function () {
   var mainNode = document.querySelector("main");
-  var winnerNode = document.querySelector('.winner-name');
-  var resetButtonNode = document.querySelector('button.reset');
+  var winnerNode = document.querySelector(".winner-name");
+  var resetButtonNode = document.querySelector("button.reset");
+  var scoreNodes = document.querySelectorAll(".score");
 
   resetScreen();
-  
+
   // event selectors
   mainNode.addEventListener("click", inputMove);
-  resetButtonNode.addEventListener("click", function() {
+  resetButtonNode.addEventListener("click", function () {
     gb.resetGame();
     resetScreen();
     showReset();
     winnerNode.innerText = gb.getWinner();
-    resetButtonNode.classList.add('hidden');
+    resetButtonNode.classList.add("hidden");
   });
 
   function inputMove(e) {
     var eData = e.target.dataset;
     gb.setBoard(eData.row, eData.col);
-    
+
     // updates the DOM
     updateDOM(e);
   }
@@ -165,17 +199,26 @@ const domHandler = (function() {
   function updateDOM(e) {
     var eData = e.target.dataset;
     e.target.innerText = gb.getBoard(eData.row, eData.col);
-    winnerNode.innerText = gb.getWinner();
+    winnerNode.innerText = gb.getWinnerSymbol();
+  
+    updateScore();
     showReset();
   }
 
+  function updateScore() {
+    var scoreArray = gb.getScore();
+    for (let i = 0; i < scoreNodes.length; ++i) {
+      scoreNodes[i].innerText = scoreArray[i];
+    }
+  }
+
   function resetScreen() {
-    var buttons = mainNode.querySelectorAll('button');
-    buttons.forEach((button) => button.innerText = gb.BLANK);
+    var buttons = mainNode.querySelectorAll("button");
+    buttons.forEach((button) => (button.innerText = gb.BLANK));
   }
 
   function showReset() {
-    if(gb.getWinner()) resetButtonNode.classList.remove('hidden');
+    if (gb.hasWinner()) resetButtonNode.classList.remove("hidden");
   }
 
   return { inputMove };
