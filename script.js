@@ -78,6 +78,9 @@ const game = (function () {
 
       // check for draw
       if (moveCount >= B_LENGTH ** 2) winner = DRAW;
+
+      // add points
+      if (winner !== BLANK) turn.addPoint();
     };
 
     const switchTurn = function () {
@@ -89,13 +92,12 @@ const game = (function () {
       if (board[row][col] === BLANK) {
         board[row][col] = turn.getSymbol();
         moveCount += 1;
+        checkWinner(row, col);
         switchTurn();
       } else {
         console.log("INVALID: There is already a mark there! Try again.");
       }
 
-      checkWinner(row, col);
-      console.log("Printing board: ");
       printBoard();
     };
 
