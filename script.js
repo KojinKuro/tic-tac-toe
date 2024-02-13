@@ -9,23 +9,20 @@ const game = (function () {
 
     const getSymbol = () => playerSymbol;
 
+    const getScore = () => points;
+
     const addScore = function () {
       points += 1;
-    };
-
-    const getScore = function () {
-      return points;
     };
 
     return { getSymbol, setSymbol, getScore, addScore };
   }
 
   function createGameBoard(p1, p2) {
-    const BLANK = "_";
-    const DRAW = "DRAW";
+    const BLANK = '';
 
-    let click = new Audio("./sounds/click.wav");
-    let win = new Audio("./sounds/win.wav");
+    let click = new Audio('./sounds/click.wav');
+    let win = new Audio('./sounds/win.wav');
 
     let player1 = p1;
     let player2 = p2;
@@ -46,8 +43,8 @@ const game = (function () {
 
     const getBoard = function (x, y) {
       if (!arguments.length) return board;
-      if (arguments.length !== 2) throw new Error("Missing parameters");
-      return board[x][y];
+      if (arguments.length === 2) return board[x][y];
+      throw new Error("Missing parameters");
     };
 
     const setWinner = function (newWinner) {
@@ -99,6 +96,7 @@ const game = (function () {
     const switchTurn = function () {
       if (turn === player1) turn = player2;
       else turn = player1;
+      return turn;
     };
 
     const hasWinner = () => {
@@ -113,20 +111,16 @@ const game = (function () {
     };
 
     const setBoard = function (row, col) {
-      if (board[row][col] === BLANK) {
-        board[row][col] = turn.getSymbol();
-        moveCount += 1;
-        checkWinner(row, col);
+      if(board[row][col] !== BLANK) throw new Error('INVALID: There is already a mark there! Try again.');
+      
+      board[row][col] = turn.getSymbol();
+      moveCount += 1;
+      checkWinner(row, col);
 
-        if (hasWinner() && !isTied()) win.play();
-        else click.play();
+      if (hasWinner() && !isTied()) win.play();
+      else click.play();
 
-        switchTurn();
-      } else {
-        console.log("INVALID: There is already a mark there! Try again.");
-      }
-
-      printBoard();
+      switchTurn();
     };
 
     const printBoard = function () {
@@ -134,8 +128,7 @@ const game = (function () {
         var rowString = `row ${x}: `;
         for (let y = 0; y < board.length; ++y) {
           rowString += `${board[x][y]} `;
-        }
-        console.log(rowString);
+        } console.log(rowString);
       }
       console.log(winner);
     };
@@ -154,6 +147,7 @@ const game = (function () {
     return {
       getBoard,
       setBoard,
+      printBoard,
       resetGame,
       getWinnerSymbol,
       hasWinner,
@@ -166,23 +160,28 @@ const game = (function () {
   return { createGameBoard, createPlayer };
 })();
 
-var p1 = game.createPlayer("📙");
-var p2 = game.createPlayer("O");
+var p1 = game.createPlayer('📙');
+var p2 = game.createPlayer('O');
 var gb = game.createGameBoard(p1, p2);
 
 const domHandler = (function () {
-  var mainNode = document.querySelector("main");
-  var buttons = mainNode.querySelectorAll("button");
-  var winnerNode = document.querySelector(".winner-name");
+  var mainNode = document.querySelector('main');
+  var buttons = mainNode.querySelectorAll('button');
+  var winnerNode = document.querySelector('.winner-name');
 
   var p1SymbolNode = document.querySelector('#player1-symbol');
   var p2SymbolNode = document.querySelector('#player2-symbol');
-  var scoreNodes = document.querySelectorAll(".score");
+  var scoreNodes = document.querySelectorAll('.score');
 
   resetScreen();
 
   // event selectors
-  mainNode.addEventListener('click', inputMove);
+  mainNode.addEventListener('click', function(event) {
+    inputMove(event);
+    updateDOM(event);
+    updateSymbol();
+    updateScore();
+  });
   p1SymbolNode.addEventListener('click',inputSymbol);
   p2SymbolNode.addEventListener('click',inputSymbol);
 
@@ -194,15 +193,13 @@ const domHandler = (function () {
 
     var eData = event.target.dataset;
     gb.setBoard(eData.row, eData.col);
-    updateDOM(event);
+    gb.printBoard();
   }
 
-  function updateDOM(e) {
-    var eData = e.target.dataset;
-    e.target.innerText = gb.getBoard(eData.row, eData.col);
+  function updateDOM(event) {
+    var eventData = event.target.dataset;
+    event.target.innerText = gb.getBoard(eventData.row, eventData.col);
     winnerNode.innerText = gb.getWinnerSymbol();
-    updateSymbol();
-    updateScore();
   }
 
   function updateScore() {
@@ -231,14 +228,13 @@ const domHandler = (function () {
 
     function setSymbol(event) {
       if (event.key !== 'Enter' && event.type !== 'focusout') return;
-      symbolNode.innerHTML = ''
 
+      symbolNode.innerHTML = ''
       if(inputBox.value !== '') {
-        if(symbolNode.id === "player1-symbol") p1.setSymbol(inputBox.value);
+        if(symbolNode.id === 'player1-symbol') p1.setSymbol(inputBox.value);
         else p2.setSymbol(inputBox.value);          
       }
-
-      updateSymbol();        
+      updateSymbol();
       symbolNode.removeEventListener('keypress', setSymbol);
       symbolNode.removeEventListener('focusout', setSymbol);
       symbolNode.addEventListener('click', inputSymbol);
