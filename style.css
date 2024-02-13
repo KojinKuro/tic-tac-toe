@@ -12,6 +12,8 @@ body {
   display: flex;
   flex-direction: column;
   background-color: white;
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
 }
 
 main {
