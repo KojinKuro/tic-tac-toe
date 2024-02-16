@@ -193,8 +193,8 @@ const domHandler = (function () {
       return;
     }
 
-    var eData = event.target.dataset;
-    gb.setBoard(eData.row, eData.col);
+    var eventData = event.target.dataset;
+    gb.setBoard(eventData.row, eventData.col);
     gb.printBoard();
   }
 
