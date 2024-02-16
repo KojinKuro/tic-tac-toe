@@ -19,10 +19,10 @@ const game = (function () {
   }
 
   function createGameBoard(p1, p2) {
-    const BLANK = '';
+    const BLANK = "";
 
-    let click = new Audio('./sounds/click.wav');
-    let win = new Audio('./sounds/win.wav');
+    let click = new Audio("./sounds/click.wav");
+    let win = new Audio("./sounds/win.wav");
 
     let player1 = p1;
     let player2 = p2;
@@ -52,9 +52,10 @@ const game = (function () {
       winner = newWinner;
     };
 
-    const checkWinner = function (x, y) {
+    const checkWinner = function (xPos, yPos) {
       if (hasWinner()) return;
-
+      const x = +xPos;
+      const y = +yPos;
       const SYMBOL = board[x][y];
       const B_LENGTH = board.length;
       const B_END = B_LENGTH - 1;
@@ -111,14 +112,15 @@ const game = (function () {
     };
 
     const setBoard = function (row, col) {
-      if(board[row][col] !== BLANK) throw new Error('INVALID: There is already a mark there! Try again.');
-      
+      if (board[row][col] !== BLANK)
+        throw new Error("INVALID: There is already a mark there! Try again.");
+
       board[row][col] = turn.getSymbol();
       moveCount += 1;
       checkWinner(row, col);
 
       if (hasWinner() && !isTied()) win.play();
-      else click.play();
+      else click.cloneNode().play();
 
       switchTurn();
     };
@@ -128,7 +130,8 @@ const game = (function () {
         var rowString = `row ${x}: `;
         for (let y = 0; y < board.length; ++y) {
           rowString += `${board[x][y]} `;
-        } console.log(rowString);
+        }
+        console.log(rowString);
       }
       console.log(winner);
     };
@@ -160,46 +163,45 @@ const game = (function () {
   return { createGameBoard, createPlayer };
 })();
 
-var p1 = game.createPlayer('📙');
-var p2 = game.createPlayer('O');
+var p1 = game.createPlayer("📙");
+var p2 = game.createPlayer("O");
 var gb = game.createGameBoard(p1, p2);
 
 const domHandler = (function () {
-  var mainNode = document.querySelector('main');
-  var buttons = mainNode.querySelectorAll('button');
-  var winnerNode = document.querySelector('.winner-name');
+  var gameContainer = document.querySelector("#game-container");
 
-  var p1SymbolNode = document.querySelector('#player1-symbol');
-  var p2SymbolNode = document.querySelector('#player2-symbol');
-  var scoreNodes = document.querySelectorAll('.score');
-
-  resetScreen();
+  var p1SymbolNode = document.querySelector("#player1-symbol");
+  var p2SymbolNode = document.querySelector("#player2-symbol");
+  var scoreNodes = document.querySelectorAll(".score");
 
   // event selectors
-  mainNode.addEventListener('click', function(event) {
+  gameContainer.addEventListener("click", function (event) {
     inputMove(event);
     updateDOM(event);
     updateSymbol();
     updateScore();
   });
-  p1SymbolNode.addEventListener('click',inputSymbol);
-  p2SymbolNode.addEventListener('click',inputSymbol);
+  p1SymbolNode.addEventListener("click", inputSymbol);
+  p2SymbolNode.addEventListener("click", inputSymbol);
+
+  resetScreen();
 
   function inputMove(event) {
-    if(gb.hasWinner()) { 
+    if (gb.hasWinner()) {
+      console.log("winner found, reseting game");
       resetScreen();
       return;
     }
 
-    var eData = event.target.dataset;
-    gb.setBoard(eData.row, eData.col);
+    var eventData = event.target.dataset;
+    gb.setBoard(eventData.row, eventData.col);
     gb.printBoard();
   }
 
   function updateDOM(event) {
     var eventData = event.target.dataset;
-    event.target.innerText = gb.getBoard(eventData.row, eventData.col);
-    winnerNode.innerText = gb.getWinnerSymbol();
+    const symbol = gb.getBoard(eventData.row, eventData.col);
+    event.target.innerHTML = `<span class="container-child">${symbol}</span>`;
   }
 
   function updateScore() {
@@ -216,34 +218,34 @@ const domHandler = (function () {
 
   function inputSymbol(event) {
     var symbolNode = event.currentTarget;
-    var inputBox = document.createElement('input');
-    inputBox.setAttribute('type','text');
-    symbolNode.innerHTML = ''
+    var inputBox = document.createElement("input");
+    inputBox.setAttribute("type", "text");
+    symbolNode.innerHTML = "";
     symbolNode.appendChild(inputBox);
     inputBox.focus();
 
-    symbolNode.removeEventListener('click', inputSymbol);
-    symbolNode.addEventListener('keypress', setSymbol);
-    symbolNode.addEventListener('focusout', setSymbol);
+    symbolNode.removeEventListener("click", inputSymbol);
+    symbolNode.addEventListener("keypress", setSymbol);
+    symbolNode.addEventListener("focusout", setSymbol);
 
     function setSymbol(event) {
-      if (event.key !== 'Enter' && event.type !== 'focusout') return;
+      if (event.key !== "Enter" && event.type !== "focusout") return;
 
-      symbolNode.innerHTML = ''
-      if(inputBox.value !== '') {
-        if(symbolNode.id === 'player1-symbol') p1.setSymbol(inputBox.value);
-        else p2.setSymbol(inputBox.value);          
+      symbolNode.innerHTML = "";
+      if (inputBox.value !== "") {
+        if (symbolNode.id === "player1-symbol") p1.setSymbol(inputBox.value);
+        else p2.setSymbol(inputBox.value);
       }
       updateSymbol();
-      symbolNode.removeEventListener('keypress', setSymbol);
-      symbolNode.removeEventListener('focusout', setSymbol);
-      symbolNode.addEventListener('click', inputSymbol);
+      symbolNode.removeEventListener("keypress", setSymbol);
+      symbolNode.removeEventListener("focusout", setSymbol);
+      symbolNode.addEventListener("click", inputSymbol);
     }
   }
 
   function resetScreen() {
-    buttons.forEach((button) => (button.innerText = gb.BLANK));
-    winnerNode.innerText = gb.getWinnerSymbol();
+    var gameTexts = document.querySelectorAll(".container-child");
+    gameTexts.forEach((gameText) => (gameText.innerText = gb.BLANK));
     updateSymbol();
     gb.resetGame();
   }

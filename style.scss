@@ -1,69 +1,120 @@
 $clr-background: white;
 $clr-grid: black;
 
+$game-size: 700px;
+$grid-size: 7px;
+$game-text: 0.75;
+
 .hidden {
   display: none;
 }
 
 html, body {
-  height: 100%;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  background-color: $clr-background;
 
   font-family: "Roboto Mono", monospace;
   font-optical-sizing: auto;
 }
 
-main {
-  flex: 1;
+body {
+  display: grid;
+  grid-template-rows: 1fr 75px 50px;
+  gap: 10px;
+
+  background-color: $clr-background;
 }
 
-#grid {
-  $square-size: 200px;
-  $symbol-size: calc($square-size*0.7);
-  $grid-size: 7px;
+#game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+// fix for scaling of the scaling of the grid
+@media (orientation: landscape) {
+  #game-with-grid {
+    max-height: $game-size;
+    height: 100%;    
+  }
+}
+
+@media (orientation: portrait) {
+  #game-with-grid {
+    max-width: $game-size;
+    width: 100%;    
+  }
+}
+
+#game-with-grid {
   display: grid;
-  grid-template: repeat(3,$square-size) / repeat(3,$square-size);
-  width: calc(3*$square-size);
+  grid-template: repeat(3,1fr) / repeat(3,1fr);
+  aspect-ratio: 1/1;
 
   gap: $grid-size;
 
   background-color: $clr-grid;
 
-  button {
-    font-size: $symbol-size;
+  & > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 50px;
+    min-width: 50px;
+
     border: none;
     background-color: $clr-background;
   }
-}
 
-main > #game {
-  display: flex;
-  justify-content: center;
-
-  margin: 20px;
+  .container {
+    container-type: size;
+    overflow: hidden;
+  }
+  
+  .container-child {
+    font-size: 80cqw;
+  }
 }
 
 #score-section {
-  display: grid;
-  grid-template:  repeat(2,3rem) / 500px 200px 500px;
+  $score-font-size: 2rem;
 
-  font-size: 3rem;
+  display: grid;
+  grid-template:  repeat(2,1fr) / 2fr 1fr 2fr;
+
+  font-size: $score-font-size;
   text-align: center;
   justify-content: center;
+
+  .symbol input {
+    font-size: $score-font-size;
+    width: 2ch;
+  }
 }
 
 footer {
   text-align: center;
-  // background-color: grey;
+  justify-self: center;
+  align-self: center;
 
   font-size: 1.25rem;
-  padding: 15px 0;
+}
+
+@media screen and (max-width: 620px) {
+  $score-font-size: 1.25rem;
+  #score-section {
+    display: grid;
+    grid-template:  repeat(2,1fr) / 2fr 1fr 2fr;
+
+    font-size: $score-font-size;
+    text-align: center;
+    justify-content: center;
+
+    .symbol input {
+      font-size: $score-font-size;
+      width: 2ch;
+    }
+  }
 }

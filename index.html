@@ -12,43 +12,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <nav>
-      <select name="opponent" id="opponent">
-        <option>Human</option>
-        <option>Robot</option>
-      </select>
-    </nav>
-  </header>
-
-  <main>
-    <section id="game">
-      <div id="grid">
-        <button id="top_left" data-row="0" data-col="0">Test</button>
-        <button id="top_mid" data-row="0" data-col="1">Test</button>
-        <button id="top_right" data-row="0" data-col="2">Test</button>
-        <button id="mid_left" data-row="1" data-col="0">Test</button>
-        <button id="mid_mid" data-row="1" data-col="1">Test</button>
-        <button id="mid_right" data-row="1" data-col="2">Test</button>
-        <button id="bot_left" data-row="2" data-col="0">Test</button>
-        <button id="bot_mid" data-row="2" data-col="1">Test</button>
-        <button id="bot_right" data-row="2" data-col="2">Test</button>
-      </div>
-    </section>
-
-    <section id="score-section">
-      <div id="player1-name">Player 1 (<span id="player1-symbol">X</span>)</div>
-      <div id="tie-name">TIE</div>
-      <div id="player2-name">Player 2 (<span id="player2-symbol">O</span>)</div>
-      
+  <section id="game-container">
+    <div id="game-with-grid">
+      <div class="container" id="top_left" data-row="0" data-col="0"><span class="container-child"></span></div>
+      <div class="container" id="top_mid" data-row="0" data-col="1"><span class="container-child"></span></div>
+      <div class="container" id="top_right" data-row="0" data-col="2"><span class="container-child"></span></div>
+      <div class="container" id="mid_left" data-row="1" data-col="0"><span class="container-child"></span></div>
+      <div class="container" id="mid_mid" data-row="1" data-col="1"><span class="container-child"></span></div>
+      <div class="container" id="mid_right" data-row="1" data-col="2"><span class="container-child"></span></div>
+      <div class="container" id="bot_left" data-row="2" data-col="0"><span class="container-child"></span></div>
+      <div class="container" id="bot_mid" data-row="2" data-col="1"><span class="container-child"></span></div>
+      <div class="container" id="bot_right" data-row="2" data-col="2"><span class="container-child"></span></div>
+    </div>
+  </section>
+  <section id="score-section">
+    <div>
+      <div id="player1-name">Player 1 (<span id="player1-symbol" class="symbol">X</span>)</div>
       <div class="score" id="player1-score">0</div>
+    </div>
+    <div>
+      <div id="tie-name">TIE</div>
       <div class="score" id="tie-score">0</div>
+    </div>
+    <div>
+      <div id="player2-name">Player 2 (<span id="player2-symbol" class="symbol">O</span>)</div>
       <div class="score" id="player2-score">0</div>
-    </section>
-
-    <section>Winner is <span class="winner-name"></span></section>
-  </main>
-
+    </div>
+  </section>
   <footer>Coded by Charles Kwang</footer>
 </body>
 </html>
