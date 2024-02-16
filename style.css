@@ -3,52 +3,93 @@
 }
 
 html, body {
-  height: 100%;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
   font-family: "Roboto Mono", monospace;
   font-optical-sizing: auto;
 }
 
-main {
-  flex: 1;
-}
-
-#grid {
+body {
   display: grid;
-  grid-template: repeat(3, 200px)/repeat(3, 200px);
-  width: 600px;
-  gap: 7px;
-  background-color: black;
-}
-#grid button {
-  font-size: 140px;
-  border: none;
+  grid-template-rows: 1fr 75px 50px;
+  padding: 10px;
+  gap: 10px;
   background-color: white;
 }
 
-main > #game {
+#game-container {
+  background-color: red;
   display: flex;
   justify-content: center;
-  margin: 20px;
+  align-items: center;
+}
+
+@media (orientation: landscape) {
+  #game-with-grid {
+    max-height: 700px;
+    height: 100%;
+  }
+}
+@media (orientation: portrait) {
+  #game-with-grid {
+    max-width: 700px;
+    width: 100%;
+  }
+}
+#game-with-grid {
+  display: grid;
+  grid-template: repeat(3, 1fr)/repeat(3, 1fr);
+  aspect-ratio: 1/1;
+  gap: 7px;
+  background-color: black;
+}
+#game-with-grid > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 50px;
+  min-width: 50px;
+  border: none;
+  background-color: white;
+}
+#game-with-grid .container {
+  container-type: size;
+  overflow: hidden;
+}
+#game-with-grid .container-child {
+  font-size: 80cqw;
 }
 
 #score-section {
   display: grid;
-  grid-template: repeat(2, 3rem)/500px 200px 500px;
-  font-size: 3rem;
+  grid-template: repeat(2, 1fr)/2fr 1fr 2fr;
+  font-size: 2rem;
   text-align: center;
   justify-content: center;
+}
+#score-section .symbol input {
+  font-size: 2rem;
+  width: 2ch;
 }
 
 footer {
   text-align: center;
+  justify-self: center;
+  align-self: center;
   font-size: 1.25rem;
-  padding: 15px 0;
+}
+
+@media screen and (max-width: 620px) {
+  #score-section {
+    display: grid;
+    grid-template: repeat(2, 1fr)/2fr 1fr 2fr;
+    font-size: 1.25rem;
+    text-align: center;
+    justify-content: center;
+  }
+  #score-section .symbol input {
+    font-size: 1.25rem;
+    width: 2ch;
+  }
 }/*# sourceMappingURL=style.css.map */
