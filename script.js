@@ -52,9 +52,10 @@ const game = (function () {
       winner = newWinner;
     };
 
-    const checkWinner = function (x, y) {
+    const checkWinner = function (xPos, yPos) {
       if (hasWinner()) return;
-
+      const x = +xPos;
+      const y = +yPos;
       const SYMBOL = board[x][y];
       const B_LENGTH = board.length;
       const B_END = B_LENGTH - 1;
@@ -119,7 +120,7 @@ const game = (function () {
       checkWinner(row, col);
 
       if (hasWinner() && !isTied()) win.play();
-      else click.play();
+      else click.cloneNode().play();
 
       switchTurn();
     };
@@ -183,6 +184,8 @@ const domHandler = (function () {
   p1SymbolNode.addEventListener("click", inputSymbol);
   p2SymbolNode.addEventListener("click", inputSymbol);
 
+  resetScreen();
+
   function inputMove(event) {
     if (gb.hasWinner()) {
       console.log("winner found, reseting game");
@@ -242,7 +245,7 @@ const domHandler = (function () {
 
   function resetScreen() {
     var gameTexts = document.querySelectorAll(".container-child");
-    gameTexts.forEach((gameText) => (gameText.innerText = ""));
+    gameTexts.forEach((gameText) => (gameText.innerText = gb.BLANK));
     updateSymbol();
     gb.resetGame();
   }
