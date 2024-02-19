@@ -1,3 +1,20 @@
+@charset "UTF-8";
+.relative {
+  position: relative;
+}
+
+.crown-left::before {
+  position: absolute;
+  left: -2ch;
+  content: "👑";
+}
+
+.crown-right::before {
+  position: absolute;
+  right: -2ch;
+  content: "👑";
+}
+
 .hidden {
   display: none;
 }
@@ -90,8 +107,9 @@ footer {
 
 @media screen and (max-width: 620px) {
   #score-section {
-    display: grid;
-    grid-template: repeat(2, 1fr)/2fr 1fr 2fr;
+    display: flex;
+    justify-content: center;
+    gap: 5vw;
     font-size: 1.5rem;
     text-align: center;
     justify-content: center;
