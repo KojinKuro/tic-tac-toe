@@ -18,17 +18,23 @@ const game = (function () {
     return { getSymbol, setSymbol, getScore, addScore };
   }
 
+  function Move(xPos, yPos) {
+    this.x = xPos;
+    this.y = yPos;
+  }
+
   function createGameBoard(p1, p2) {
     const BLANK = "";
 
     let click = new Audio("./sounds/click.wav");
     let win = new Audio("./sounds/win.wav");
 
-    let player1 = p1;
-    let player2 = p2;
-    let tie = createPlayer("Tie");
+    const player1 = p1;
+    const player2 = p2;
+    const tie = createPlayer("Tie");
     let turn = player1;
     let winner = BLANK;
+    const winnerMoves = [];
 
     let moveCount = 0;
     let board = [
@@ -38,7 +44,11 @@ const game = (function () {
     ];
 
     const getScore = function () {
-      return [player1.getScore(), tie.getScore(), player2.getScore()];
+      return {
+        player1: player1.getScore(),
+        tie: tie.getScore(),
+        player2: player2.getScore(),
+      };
     };
 
     const getBoard = function (x, y) {
@@ -52,6 +62,17 @@ const game = (function () {
       winner = newWinner;
     };
 
+    const resetInputMoves = () => {
+      winnerMoves = [];
+    };
+
+    const inputWinnerMoves = function (xPos, yPos) {
+      if (winnerMoves.length >= board.length) winnerMoves.shift();
+      winnerMoves.push(new Move(xPos, yPos));
+    };
+
+    const getWinnerMoves = () => winnerMoves;
+
     const checkWinner = function (xPos, yPos) {
       if (hasWinner()) return;
       const x = +xPos;
@@ -63,20 +84,32 @@ const game = (function () {
       // check columns
       for (let i = 0; i < B_LENGTH; ++i) {
         if (board[x][i] !== SYMBOL) break;
-        if (i === B_END) setWinner(turn);
+        inputWinnerMoves(x, i);
+        if (i === B_END) {
+          setWinner(turn);
+          return;
+        }
       }
 
       // check rows
       for (let i = 0; i < B_LENGTH; ++i) {
         if (board[i][y] !== SYMBOL) break;
-        if (i === B_END) setWinner(turn);
+        inputWinnerMoves(i, y);
+        if (i === B_END) {
+          setWinner(turn);
+          return;
+        }
       }
 
       // check diagonal
       if (x === y) {
         for (let i = 0; i < B_LENGTH; ++i) {
           if (board[i][i] != SYMBOL) break;
-          if (i === B_END) setWinner(turn);
+          inputWinnerMoves(i, i);
+          if (i === B_END) {
+            setWinner(turn);
+            return;
+          }
         }
       }
 
@@ -84,13 +117,19 @@ const game = (function () {
       if (x + y == B_END) {
         for (let i = 0; i < B_LENGTH; ++i) {
           if (board[i][B_END - i] !== SYMBOL) break;
-          if (i === B_END) setWinner(turn);
+          inputWinnerMoves(i, B_END - i);
+          if (i === B_END) {
+            setWinner(turn);
+            return;
+          }
         }
       }
 
       // check for draw
       if (moveCount >= B_LENGTH ** 2 && !hasWinner()) {
+        resetInputMoves();
         setWinner(tie);
+        return;
       }
     };
 
@@ -110,6 +149,8 @@ const game = (function () {
       if (hasWinner()) return winner.getSymbol();
       return BLANK;
     };
+
+    const getWinner = () => winner;
 
     const setBoard = function (row, col) {
       if (board[row][col] !== BLANK)
@@ -133,7 +174,6 @@ const game = (function () {
         }
         console.log(rowString);
       }
-      console.log(winner);
     };
 
     const resetGame = function () {
@@ -157,6 +197,8 @@ const game = (function () {
       isTied,
       BLANK,
       getScore,
+      getWinnerMoves,
+      getWinner,
     };
   }
 
@@ -172,13 +214,16 @@ const domHandler = (function () {
 
   var p1SymbolNode = document.querySelector("#player1-symbol");
   var p2SymbolNode = document.querySelector("#player2-symbol");
-  var scoreNodes = document.querySelectorAll(".score");
+
+  var p1ScoreNode = document.querySelector(".score#player1-score");
+  var tieScoreNode = document.querySelector(".score#tie-score");
+  var p2ScoreNode = document.querySelector(".score#player2-score");
 
   // event selectors
   gameContainer.addEventListener("click", function (event) {
     inputMove(event);
-    updateDOM(event);
-    updateSymbol();
+    updateMoveInput(event);
+    updatePlayerSymbols();
     updateScore();
   });
   p1SymbolNode.addEventListener("click", inputSymbol);
@@ -188,30 +233,39 @@ const domHandler = (function () {
 
   function inputMove(event) {
     if (gb.hasWinner()) {
-      console.log("winner found, reseting game");
       resetScreen();
       return;
     }
 
     var eventData = event.target.dataset;
     gb.setBoard(eventData.row, eventData.col);
+    if (gb.hasWinner()) blinkWinner();
     gb.printBoard();
   }
 
-  function updateDOM(event) {
-    var eventData = event.target.dataset;
-    const symbol = gb.getBoard(eventData.row, eventData.col);
-    event.target.innerHTML = `<span class="container-child">${symbol}</span>`;
+  function blinkWinner() {
+    let moves = gb.getWinnerMoves();
+    moves.forEach((move) => {
+      let spanQuery = `[data-row="${move.x}"][data-col="${move.y}"] span`;
+      let span = document.querySelector(spanQuery);
+      span.classList.add("blink");
+    });
+  }
+
+  function updateMoveInput(event) {
+    var gameSquare = event.target.dataset;
+    const symbol = gb.getBoard(gameSquare.row, gameSquare.col);
+    event.target.querySelector("span").innerText = symbol;
   }
 
   function updateScore() {
-    var scoreArray = gb.getScore();
-    for (let i = 0; i < scoreNodes.length; ++i) {
-      scoreNodes[i].innerText = scoreArray[i];
-    }
+    var score = gb.getScore();
+    p1ScoreNode.innerText = score.player1;
+    tieScoreNode.innerText = score.tie;
+    p2ScoreNode.innerText = score.player2;
   }
 
-  function updateSymbol() {
+  function updatePlayerSymbols() {
     p1SymbolNode.innerText = p1.getSymbol();
     p2SymbolNode.innerText = p2.getSymbol();
   }
@@ -236,7 +290,7 @@ const domHandler = (function () {
         if (symbolNode.id === "player1-symbol") p1.setSymbol(inputBox.value);
         else p2.setSymbol(inputBox.value);
       }
-      updateSymbol();
+      updatePlayerSymbols();
       symbolNode.removeEventListener("keypress", setSymbol);
       symbolNode.removeEventListener("focusout", setSymbol);
       symbolNode.addEventListener("click", inputSymbol);
@@ -244,9 +298,12 @@ const domHandler = (function () {
   }
 
   function resetScreen() {
-    var gameTexts = document.querySelectorAll(".container-child");
-    gameTexts.forEach((gameText) => (gameText.innerText = gb.BLANK));
-    updateSymbol();
+    var gameContainerSpans = document.querySelectorAll(".container span");
+    gameContainerSpans.forEach((span) => {
+      span.classList.remove("blink");
+      span.innerText = "";
+    });
+    updatePlayerSymbols();
     gb.resetGame();
   }
 
