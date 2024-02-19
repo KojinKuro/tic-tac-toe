@@ -9,9 +9,15 @@ $game-text: 0.75;
   position:relative;
 }
 
-.crown::before {
+.crown-left::before {
   position: absolute;
   left: -2ch;
+  content: '👑';
+}
+
+.crown-right::before {
+  position: absolute;
+  right: -2ch;
   content: '👑';
 }
 

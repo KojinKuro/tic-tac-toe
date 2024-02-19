@@ -241,12 +241,12 @@ const domHandler = (function () {
   function updateWinner() {
     switch (gb.getWinner()) {
       case p1:
-        p1NameNode.classList.add("crown");
-        p2NameNode.classList.remove("crown");
+        p1NameNode.classList.add("crown-left");
+        p2NameNode.classList.remove("crown-right");
         break;
       case p2:
-        p1NameNode.classList.remove("crown");
-        p2NameNode.classList.add("crown");
+        p1NameNode.classList.remove("crown-left");
+        p2NameNode.classList.add("crown-right");
         break;
     }
     blinkWinner();
