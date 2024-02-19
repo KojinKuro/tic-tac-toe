@@ -24,23 +24,22 @@ const game = (function () {
   }
 
   function createGameBoard(p1, p2) {
-    const BLANK = "";
-
     let click = new Audio("./sounds/click.wav");
     let win = new Audio("./sounds/win.wav");
 
     const player1 = p1;
     const player2 = p2;
     const tie = createPlayer("Tie");
+    const blankPlayer = createPlayer("");
     let turn = player1;
-    let winner = BLANK;
+    let winner = blankPlayer;
     const winnerMoves = [];
 
     let moveCount = 0;
     let board = [
-      [BLANK, BLANK, BLANK],
-      [BLANK, BLANK, BLANK],
-      [BLANK, BLANK, BLANK],
+      [blankPlayer, blankPlayer, blankPlayer],
+      [blankPlayer, blankPlayer, blankPlayer],
+      [blankPlayer, blankPlayer, blankPlayer],
     ];
 
     const getScore = function () {
@@ -145,18 +144,13 @@ const game = (function () {
 
     const isTied = () => winner === tie;
 
-    const getWinnerSymbol = function () {
-      if (hasWinner()) return winner.getSymbol();
-      return BLANK;
-    };
-
     const getWinner = () => winner;
 
     const setBoard = function (row, col) {
-      if (board[row][col] !== BLANK)
+      if (board[row][col] !== blankPlayer)
         throw new Error("INVALID: There is already a mark there! Try again.");
 
-      board[row][col] = turn.getSymbol();
+      board[row][col] = turn === player1 ? player1 : player2;
       moveCount += 1;
       checkWinner(row, col);
 
@@ -170,7 +164,8 @@ const game = (function () {
       for (let x = 0; x < board.length; ++x) {
         var rowString = `row ${x}: `;
         for (let y = 0; y < board.length; ++y) {
-          rowString += `${board[x][y]} `;
+          if (board[x][y] === blankPlayer) rowString += "_";
+          rowString += `${board[x][y].getSymbol()} `;
         }
         console.log(rowString);
       }
@@ -178,12 +173,12 @@ const game = (function () {
 
     const resetGame = function () {
       turn = player1;
-      winner = BLANK;
+      winner = blankPlayer;
       moveCount = 0;
       board = [
-        [BLANK, BLANK, BLANK],
-        [BLANK, BLANK, BLANK],
-        [BLANK, BLANK, BLANK],
+        [blankPlayer, blankPlayer, blankPlayer],
+        [blankPlayer, blankPlayer, blankPlayer],
+        [blankPlayer, blankPlayer, blankPlayer],
       ];
     };
 
@@ -192,10 +187,8 @@ const game = (function () {
       setBoard,
       printBoard,
       resetGame,
-      getWinnerSymbol,
       hasWinner,
       isTied,
-      BLANK,
       getScore,
       getWinnerMoves,
       getWinner,
@@ -222,8 +215,7 @@ const domHandler = (function () {
   // event selectors
   gameContainer.addEventListener("click", function (event) {
     inputMove(event);
-    updateMoveInput(event);
-    updatePlayerSymbols();
+    updateSymbols();
     updateScore();
   });
   p1SymbolNode.addEventListener("click", inputSymbol);
@@ -252,12 +244,6 @@ const domHandler = (function () {
     });
   }
 
-  function updateMoveInput(event) {
-    var gameSquare = event.target.dataset;
-    const symbol = gb.getBoard(gameSquare.row, gameSquare.col);
-    event.target.querySelector("span").innerText = symbol;
-  }
-
   function updateScore() {
     var score = gb.getScore();
     p1ScoreNode.innerText = score.player1;
@@ -265,7 +251,15 @@ const domHandler = (function () {
     p2ScoreNode.innerText = score.player2;
   }
 
-  function updatePlayerSymbols() {
+  function updateSymbols() {
+    for (let x = 0; x < gb.getBoard().length; ++x) {
+      for (let y = 0; y < gb.getBoard().length; ++y) {
+        let spanQuery = `[data-row="${x}"][data-col="${y}"] span`;
+        let span = gameContainer.querySelector(spanQuery);
+        span.innerText = gb.getBoard(x, y).getSymbol();
+      }
+    }
+
     p1SymbolNode.innerText = p1.getSymbol();
     p2SymbolNode.innerText = p2.getSymbol();
   }
@@ -290,7 +284,7 @@ const domHandler = (function () {
         if (symbolNode.id === "player1-symbol") p1.setSymbol(inputBox.value);
         else p2.setSymbol(inputBox.value);
       }
-      updatePlayerSymbols();
+      updateSymbols();
       symbolNode.removeEventListener("keypress", setSymbol);
       symbolNode.removeEventListener("focusout", setSymbol);
       symbolNode.addEventListener("click", inputSymbol);
@@ -303,7 +297,7 @@ const domHandler = (function () {
       span.classList.remove("blink");
       span.innerText = "";
     });
-    updatePlayerSymbols();
+    updateSymbols();
     gb.resetGame();
   }
 
