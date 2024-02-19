@@ -204,7 +204,7 @@ var gb = game.createGameBoard(p1, p2);
 
 const domHandler = (function () {
   var gameContainer = document.querySelector("#game-container");
-
+  var symbolNodes = document.querySelectorAll(".symbol");
   var p1SymbolNode = document.querySelector("#player1-symbol");
   var p2SymbolNode = document.querySelector("#player2-symbol");
 
@@ -218,8 +218,7 @@ const domHandler = (function () {
     updateSymbols();
     updateScore();
   });
-  p1SymbolNode.addEventListener("click", inputSymbol);
-  p2SymbolNode.addEventListener("click", inputSymbol);
+  symbolNodes.forEach((node) => node.addEventListener("click", inputSymbol));
 
   resetScreen();
 
@@ -265,11 +264,9 @@ const domHandler = (function () {
   }
 
   function inputSymbol(event) {
-    var symbolNode = event.currentTarget;
-    var inputBox = document.createElement("input");
-    inputBox.setAttribute("type", "text");
-    symbolNode.innerHTML = "";
-    symbolNode.appendChild(inputBox);
+    let symbolNode = event.currentTarget.querySelector("span");
+    symbolNode.innerHTML = '<input type="text"/>';
+    let inputBox = symbolNode.querySelector("input");
     inputBox.focus();
 
     symbolNode.removeEventListener("click", inputSymbol);
