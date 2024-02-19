@@ -5,6 +5,16 @@ $game-size: 700px;
 $grid-size: 7px;
 $game-text: 0.75;
 
+.relative {
+  position:relative;
+}
+
+.crown::before {
+  position: absolute;
+  left: -2ch;
+  content: '👑';
+}
+
 .hidden {
   display: none;
 }
@@ -116,13 +126,14 @@ footer {
 @media screen and (max-width: 620px) {
   $score-font-size: 1.5rem;
   #score-section {
-    display: grid;
-    grid-template:  repeat(2,1fr) / 2fr 1fr 2fr;
-
+    display: flex;
+    justify-content: center;
+    gap: 5vw;
+  
     font-size: $score-font-size;
     text-align: center;
     justify-content: center;
-
+  
     .symbol input {
       font-size: $score-font-size;
       width: 2ch;

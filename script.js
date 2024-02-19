@@ -198,12 +198,16 @@ const game = (function () {
   return { createGameBoard, createPlayer };
 })();
 
-var p1 = game.createPlayer("📙");
-var p2 = game.createPlayer("O");
+var p1 = game.createPlayer("❌");
+var p2 = game.createPlayer("⭕");
 var gb = game.createGameBoard(p1, p2);
 
 const domHandler = (function () {
   var gameContainer = document.querySelector("#game-container");
+
+  var p1NameNode = document.querySelector("#player1-name");
+  var p2NameNode = document.querySelector("#player2-name");
+
   var symbolNodes = document.querySelectorAll(".symbol");
   var p1SymbolNode = document.querySelector("#player1-symbol");
   var p2SymbolNode = document.querySelector("#player2-symbol");
@@ -230,8 +234,22 @@ const domHandler = (function () {
 
     var eventData = event.target.dataset;
     gb.setBoard(eventData.row, eventData.col);
-    if (gb.hasWinner()) blinkWinner();
+    if (gb.hasWinner()) updateWinner();
     gb.printBoard();
+  }
+
+  function updateWinner() {
+    switch (gb.getWinner()) {
+      case p1:
+        p1NameNode.classList.add("crown");
+        p2NameNode.classList.remove("crown");
+        break;
+      case p2:
+        p1NameNode.classList.remove("crown");
+        p2NameNode.classList.add("crown");
+        break;
+    }
+    blinkWinner();
   }
 
   function blinkWinner() {
