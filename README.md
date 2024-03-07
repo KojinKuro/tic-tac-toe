@@ -1,12 +1,18 @@
 # Tic Tac Toe
 
 ## Description
-This is a very basic implementation of Tic Tac Toe on a website. It currently has the capability of playing Tic Tac Toe against a local opponent. Some fun things that have been added like a crown around the winner and score tracking. This website has very few global variables as one of the main goals was to design a site that used as little global variables as possible. This was done using the module pattern and factories. There are future features that are still to be added in the future, but a MVP is complete.
+This is a very basic implementation of Tic Tac Toe on a website. It currently has the capability of playing Tic Tac Toe against a local opponent. Some fun things that have been added like a crown around the winner and score tracking. This big focus I had while doing this project was using as few global variables as possible. This was done using the module pattern and factories. There are future features that are still to be added in the future, but is considered MVP complete.
 
 ## How to Use
 [Live Demo](https://kojinkuro.github.io/tic-tac-toe/)
 
-## Demo Images
+```shell
+git clone git@github.com:KojinKuro/tic-tac-toe.git
+cd tic-tac-toe
+open index.html
+```
+
+## Preview
 ![Demo image](https://i.ibb.co/VYxMQ4S/Screenshot-2024-02-18-at-8-33-13-PM.png)
 
 ## Features
@@ -15,8 +21,11 @@ This is a very basic implementation of Tic Tac Toe on a website. It currently ha
 - Keeps track of your score
 - Will scale to different screen sizes
 
+## Context
+This project took around 25 hours to complete.
+
 ## Learning Takeaways
-While working on this project, I tried to use a few global variables as possible. I did this using factories and module patterns. Something that I focused on was keeping the code clean and refactoring as I went on for readability. Something that I discovered was that as the code gets larger, the more important it is that code is well thought out and well named. Because I felt that there was not much more learning to be done continuing the project, I have paused working on it for now. Some of the things I feel proud about doing in the project was following the git workflow, writing better commits, and experimenting more with CSS.
+While working on this project, I tried to use a few global variables as possible. I did this using factories and module patterns. Something that I focused on was keeping the code clean and refactoring as I went on for readability. As the code got larger, it became more important that code was well thought out. Some of the things I feel proud about doing in the project was following the git workflow, writing better commits, and experimenting more with CSS.
 
 ## To-do
 ### JAVASCRIPT
